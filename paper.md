@@ -20,9 +20,9 @@ bibliography: ref.bib
 
 `basilisk` is an R/Bioconductor package for managing Python environments within the Bioconductor package ecosystem.
 Developers of other Bioconductor packages can use `basilisk` to automatically provision and load custom Python environments,
-providing a more streamlined experience for their end-users by avoiding the need for any manual system configuration.
+providing a streamlined experience for their end-users by avoiding the need for any manual system configuration.
 `basilisk` also enables robust execution of Python code via `reticulate` in complex analysis workflows involving multiple Python environments.
-This package serves as a standardized mechanism for integration of Python functionality into the Bioconductor code base.
+This package aims to provide a standardized mechanism for integration of Python functionality into the Bioconductor code base.
 
 # Statement of need
 
@@ -32,7 +32,7 @@ this includes the `reticulate` package to seamlessly call Python code from an R 
 and the `conda` package manager to provision environments with the appropriate Python packages [@conda].
 However, the configuration and management of the Python instances is typically the responsibility of the end user.
 R/Bioconductor packages with Python functionality often rely on the user to manually ensure that the correct versions of all Python packages are installed.
-This is burdensome, error-prone and does not scale well for widespread integration of Python code into the Bioconductor ecosystem.
+This is burdensome, error-prone and does not scale to widespread integration of Python code into the Bioconductor ecosystem.
 The [`basilisk`](https://bioconductor.org/packages/bioconductor) package aims to automate the management of Python environments required by "client" R/Bioconductor packages,
 simplifying package installation and improving the robustness of analysis workflows.
 
@@ -100,35 +100,34 @@ This "system-wide" installation is also useful on shared systems where a single 
 
 `basilisk` naturally integrates with `reticulate` to seamlessly call Python code from R.
 `basiliskRun()` will automatically load the appropriate Python instance before evaluating `fun=`, ensuring that the correct packages are available.
-If a different Python instance is already loaded into the current R session,  
-`basiliskRun()` will automatically spin up a new R process to run `fun=` before transferring the results back to the current session.
-This allows `basilisk` to support the use of `reticulate` with multiple Python environments in a single analysis,
-despite the fact that `reticulate` is limited to only one Python instance for the lifetime of an R session [@multienvreticulate].
+If a different Python instance is already loaded into the current R session, `basiliskRun()` will automatically spin up a new R process to run `fun=` before transferring the results back to the current session.
+In this manner, `basilisk` supports the use of `reticulate` with multiple Python environments in a single analysis,
+despite the fact that `reticulate` is limited to only one Python instance for the lifetime of any given R session [@multienvreticulate].
 
-This strategy ensures that a `basilisk` client package will always be able to successfully execute its Python-related code via `reticulate`.
+The use of new R processes ensures that a `basilisk` client package will always be able to successfully execute its Python-related code via `reticulate`.
 The client package remains functional even if other packages - or indeed, the user themselves - load a different Python instance into the current session.
 In fact, client packages can be forced to always start a new process in `basiliskRun()` by turning off the `getBasiliskShared()` option,
-which ensures that `basilisk` does not interfere with other uses of Python in the current session.
+which avoids interfering with non-`basilisk` usage of other Python instances via `reticulate` in the current session.
 However, this robustness comes at the cost of performance due to the need to spin up a new R process (with the associated delay from package loading) as well as the overhead of communication between different R processes.
 As such, loading of Python into the current session is preferred by default. 
 
 It is also possible to obtain the path to the environment's directory for execution of Python code outside of `reticulate`.
 This is more onerous but allows clients to directly call executables that are provided in the environment. 
 For example, the [`crisprScore`](https://bioconductor.org/packages/crisprScore) package [@crisprScore] relies on Python 2 environments that will no longer be supported by `reticulate` [@python2reticulate].
-By directly acquiring the path to the environment, the Python 2 executable can be located by `crisprScore` and used to execute legacy code.
+By directly acquiring the path to the provisioned environment, `crisprScore` can locate the Python 2 executable for execution of its legacy code.
 
 # Further comments
 
 The current set of `basilisk` clients can be found on [its Bioconductor landing page](https://bioconductor.org/packages/basilisk),
 including `snifter`, `crisprScore`, `zellkonverter`, `velociraptor` and `BiocSklearn`, to name a few.
 
-The name "basilisk" was based on the mythological monster [@rowling1998chamber].
+The name "basilisk" is based on the mythological snake monster [@rowling1998chamber].
 The original purpose of the `basilisk` package was to freeze Python package versions, much like how the monster was able to Petrify its victims.
 
 # Acknowledgements
 
 Thanks to Vince Carey, one of the first developers using `basilisk` in his [`BiocSklearn`](https://bioconductor.org/packages/BiocSklearn) package;
-Hervé Pagès, for helping to get this through the Bioconductor build system;
+Hervé Pagès, for helping me to get `basilisk` through the Bioconductor build system;
 Jean-Philippe Fortin, a `basilisk` power user with his [`crisprScore`](https://bioconductor.org/packages/crisprScore) package;
 and Luke Zappia, Alan O'Callaghan and Kevin Rue-Albrecht, for their feedback as client package developers. 
 
