@@ -103,7 +103,7 @@ by directly acquiring the path to the environment, the Python 2 executable can b
 
 Thanks to Vince Carey, one of the first developers using `basilisk` in his [`BiocSklearn`](https://bioconductor.org/packages/BiocSklearn) package;
 Hervé Pagès, for helping to get this through the Bioconductor build system;
-Jean-Phillipe Fortin, a `basilisk` power user with his [`crisprScore`](https://bioconductor.org/packages/crisprScore) package;
+Jean-Philippe Fortin, a `basilisk` power user with his [`crisprScore`](https://bioconductor.org/packages/crisprScore) package;
 and Luke Zappia, Alan O'Callaghan and Kevin Rue-Albrecht, for their feedback as client package developers. 
 
 # References
