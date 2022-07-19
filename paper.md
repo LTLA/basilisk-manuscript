@@ -1,5 +1,5 @@
 ---
-title: "basilisk: a Bioconductor package for coordinating Python environments"
+title: "basilisk: a Bioconductor package for managing Python environments"
 tags:
   - R
   - Python
@@ -13,26 +13,33 @@ affiliations:
   - name: Genentech Inc., South San Francisco, USA
     index: 1
 date: 19 July 2022
+bibliography: ref.bib
 ---
 
 # Summary
+
+`basilisk` is an R/Bioconductor package for managing Python environments within the Bioconductor package ecosystem.
+Developers of other Bioconductor packages can use `basilisk` to automatically provision and load custom Python environments,
+providing a more streamlined experience for their end-users by avoiding the need for any manual system configuration.
+`basilisk` also enables robust execution of Python code via `reticulate` in complex analysis workflows involving multiple Python environments.
+This package serves as a standardized mechanism for integration of Python functionality into the Bioconductor code base.
 
 # Statement of need
 
 The Python package ecosystem provides a large number of algorithms and tools that are relevant to R/Bioconductor users.
 Interoperability between R and Python is facilitated by several popular tools -
-this includes the `reticulate` package to seamlessly call Python code from an R session,
-and the `conda` package manager to provision environments with the appropriate Python packages.
+this includes the `reticulate` package to seamlessly call Python code from an R session [@reticulate],
+and the `conda` package manager to provision environments with the appropriate Python packages [@conda].
 However, the configuration and management of the Python instances is typically the responsibility of the end user.
 R/Bioconductor packages with Python functionality often rely on the user to manually ensure that the correct versions of all Python packages are installed.
-This is burdensome, error-prone and does not scale well for large-scale integration of Python code into the Bioconductor ecosystem.
-The **basilisk** package aims to automate the management of Python environments required by "client" R/Bioconductor packages,
+This is burdensome, error-prone and does not scale well for widespread integration of Python code into the Bioconductor ecosystem.
+The [`basilisk`](https://bioconductor.org/packages/bioconductor) package aims to automate the management of Python environments required by "client" R/Bioconductor packages,
 simplifying package installation and improving the robustness of analysis workflows.
 
 # Usage
 
 A developer of a client package is expected to define one or more `BasiliskEnvironment` objects that describe the Python environments required by the package.
-I show an small example below from the [`snifter`](https://bioconductor.org/packages/snifter) Bioconductor package (CITE ME):
+I show an small example below from the [`snifter`](https://bioconductor.org/packages/snifter) Bioconductor package [@snifter]:
 
 ```r
 snifter.env <- BasiliskEnvironment(
@@ -91,11 +98,12 @@ This "system-wide" installation is also useful on shared systems where a single 
 
 # Integrating with `reticulate`
 
-`basilisk` supports the use of `reticulate` with multiple Python environments in a single R session.
-This involves some work as only one Python instance can be loaded by `reticulate` for the lifetime of an R session (see comments [here](https://github.com/rstudio/reticulate/issues/27)).
-`basiliskRun()` will first check whether a Python instance has already been loaded into the current R session.
-If not, it will load Python from the requested environment into the current session before executing the developer-supplied function in `fun`=.
-Otherwise, it will spin up a new R process to run `fun=` before transferring the results back to the current session.
+`basilisk` naturally integrates with `reticulate` to seamlessly call Python code from R.
+`basiliskRun()` will automatically load the appropriate Python instance before evaluating `fun=`, ensuring that the correct packages are available.
+If a different Python instance is already loaded into the current R session,  
+`basiliskRun()` will automatically spin up a new R process to run `fun=` before transferring the results back to the current session.
+This allows `basilisk` to support the use of `reticulate` with multiple Python environments in a single analysis,
+despite the fact that `reticulate` is limited to only one Python instance for the lifetime of an R session [@multienvreticulate].
 
 This strategy ensures that a `basilisk` client package will always be able to successfully execute its Python-related code via `reticulate`.
 The client package remains functional even if other packages - or indeed, the user themselves - load a different Python instance into the current session.
@@ -106,8 +114,16 @@ As such, loading of Python into the current session is preferred by default.
 
 It is also possible to obtain the path to the environment's directory for execution of Python code outside of `reticulate`.
 This is more onerous but allows clients to directly call executables that are provided in the environment. 
-For example, the [`crisprScore`](https://bioconductor.org/packages/crisprScore) package relies on Python 2 environments that will [no longer be supported by `reticulate`](https://github.com/rstudio/reticulate/pull/1242);
-by directly acquiring the path to the environment, the Python 2 executable can be located and used to execute legacy code.
+For example, the [`crisprScore`](https://bioconductor.org/packages/crisprScore) package [@crisprScore] relies on Python 2 environments that will no longer be supported by `reticulate` [@python2reticulate].
+By directly acquiring the path to the environment, the Python 2 executable can be located by `crisprScore` and used to execute legacy code.
+
+# Further comments
+
+The current set of `basilisk` clients can be found on [its Bioconductor landing page](https://bioconductor.org/packages/basilisk),
+including `snifter`, `crisprScore`, `zellkonverter`, `velociraptor` and `BiocSklearn`, to name a few.
+
+The name "basilisk" was based on the mythological monster [@rowling1998chamber].
+The original purpose of the `basilisk` package was to freeze Python package versions, much like how the monster was able to Petrify its victims.
 
 # Acknowledgements
 
