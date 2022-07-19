@@ -19,6 +19,16 @@ date: 19 July 2022
 
 # Statement of need
 
+The Python package ecosystem provides a large number of algorithms and tools that are relevant to R/Bioconductor users.
+Interoperability between R and Python is facilitated by several popular tools -
+this includes the `reticulate` package to seamlessly call Python code from an R session,
+and the `conda` package manager to provision environments with the appropriate Python packages.
+However, the configuration and management of the Python instances is typically the responsibility of the end user.
+R/Bioconductor packages with Python functionality often rely on the user to manually ensure that the correct versions of all Python packages are installed.
+This is burdensome, error-prone and does not scale well for large-scale integration of Python code into the Bioconductor ecosystem.
+The **basilisk** package aims to automate the management of Python environments required by "client" R/Bioconductor packages,
+simplifying package installation and improving the robustness of analysis workflows.
+
 # Usage
 
 A developer of a client package is expected to define one or more `BasiliskEnvironment` objects that describe the Python environments required by the package.
